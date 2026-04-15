@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+
+    <style>
+        /* Basic page styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Calculator box */
+        .calculator {
+            width: 300px;
+            border: 1px solid #ccc;
+            padding: 15px;
+        }
+
+        /* Display screen */
+        .display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        /* Buttons grid - 4 columns */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        /* Button style */
+        .btn {
+            height: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        /* Hover effect */
+        .btn:hover {
+            background: #eee;
+        }
+
+        /* Zero button takes 2 columns */
+        .btn-zero {
+            grid-column: span 2;
+        }
+
+        /* Equals button takes 2 rows */
+        .btn-equals {
+            grid-row: span 2;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Calculator -->
+    <div class="calculator">
+
+        <!-- Display -->
+        <input type="text" class="display" id="display" value="0" readonly>
+
+        <!-- Buttons -->
+        <div class="buttons">
+            <!-- Row 1 -->
+            <button class="btn" onclick="clearDisplay()">C</button>
+            <button class="btn" onclick="appendToDisplay('/')">/</button>
+            <button class="btn" onclick="appendToDisplay('*')">*</button>
+            <button class="btn" onclick="appendToDisplay('-')">-</button>
+
+            <!-- Row 2 -->
+            <button class="btn" onclick="appendToDisplay('7')">7</button>
+            <button class="btn" onclick="appendToDisplay('8')">8</button>
+            <button class="btn" onclick="appendToDisplay('9')">9</button>
+            <button class="btn" onclick="appendToDisplay('+')">+</button>
+
+            <!-- Row 3 -->
+            <button class="btn" onclick="appendToDisplay('4')">4</button>
+            <button class="btn" onclick="appendToDisplay('5')">5</button>
+            <button class="btn" onclick="appendToDisplay('6')">6</button>
+            <button class="btn btn-equals" onclick="calculate()">=</button>
+
+            <!-- Row 4 -->
+            <button class="btn" onclick="appendToDisplay('1')">1</button>
+            <button class="btn" onclick="appendToDisplay('2')">2</button>
+            <button class="btn" onclick="appendToDisplay('3')">3</button>
+
+            <!-- Row 5 -->
+            <button class="btn btn-zero" onclick="appendToDisplay('0')">0</button>
+            <button class="btn" onclick="appendToDisplay('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        // Get display element
+        var display = document.getElementById('display');
+
+        // Track if display should reset on next input
+        var shouldReset = false;
+
+        // Add value to display
+        function appendToDisplay(value) {
+            if (display.value === '0' || display.value === 'Error' || shouldReset) {
+                // Keep result if user clicks an operator
+                if (shouldReset && ['+', '-', '*', '/'].includes(value)) {
+                    shouldReset = false;
+                    display.value = display.value + value;
+                    return;
+                }
+                display.value = '';
+                shouldReset = false;
+            }
+            display.value += value;
+        }
+
+        // Clear display
+        function clearDisplay() {
+            display.value = '0';
+            shouldReset = false;
+        }
+
+        // Calculate result
+        function calculate() {
+            try {
+                var expression = display.value;
+
+                // Check for division by zero
+                if (/\/0(?!\d)/.test(expression)) {
+                    display.value = 'Error';
+                    shouldReset = true;
+                    return;
+                }
+
+                // Calculate
+                var result = eval(expression);
+
+                // Check for invalid result
+                if (result === Infinity || result === -Infinity || isNaN(result)) {
+                    display.value = 'Error';
+                } else {
+                    display.value = Math.round(result * 100000000) / 100000000;
+                }
+
+                shouldReset = true;
+
+            } catch (error) {
+                display.value = 'Error';
+                shouldReset = true;
+            }
+        }
+    </script>
+
+</body>
+</html>
